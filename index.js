@@ -1,5 +1,5 @@
 const nodeMailer = require("nodemailer");
-
+const cors = require("cors);
 const express = require("express");
 const dotenv = require("dotenv");
 const port = process.env.PORT || 8000;
