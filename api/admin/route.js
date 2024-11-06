@@ -7,7 +7,7 @@ const skill = require("../../db/model/Skill");
 const fs = require("fs");
 const skillsSection = require("../../db/model/skillsSection");
 const Skill = require("../../db/model/Skill");
-const { github_url, linkedin_url } = require("../../db/model/urls");
+const urls = require("../../db/model/urls");
 
 const router = express.Router();
 
@@ -403,8 +403,8 @@ router.get("/dashboard", async (req, res) => {
         projects: projectsCount,
       },
       urls: {
-        github_url,
-        linkedin_url,
+        github_url: urls.github_url,
+        linkedin_url: urls.linkedin_url,
       },
       resumePath,
       message: "Dashboard data fetched successfully",
@@ -415,4 +415,30 @@ router.get("/dashboard", async (req, res) => {
   }
 });
 
+router.put("/urls/:platform", async (req, res) => {
+  const { platform } = req.params;
+  const { url } = req.body;
+
+  if (!url) {
+    return res.status(400).json({ message: "URL is required" });
+  }
+
+  try {
+    if (platform === "github") {
+      urls.github_url = url;
+    } else if (platform === "linkedin") {
+      urls.linkedin_url = url;
+    } else {
+      return res.status(400).json({ message: "Invalid platform" });
+    }
+
+    res.status(200).json({
+      message: `${platform} URL updated successfully`,
+      url: urls[`${platform}_url`],
+    });
+  } catch (error) {
+    console.error(`Error updating ${platform} URL:`, error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 module.exports = router;

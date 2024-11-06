@@ -1,6 +1,9 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
+const skillsSection = require("../../db/model/skillsSection");
+const project = require("../../db/model/project");
+const { github_url, linkedin_url } = require("../../db/model/urls");
 
 dotenv.config();
 const router = express.Router();
@@ -76,6 +79,24 @@ router.post("/", async (req, res) => {
     await mail(name, msg, mailId);
     console.log(name, msg, mailId);
     res.status(200).json({ message: "Message sent" });
+  } catch (er) {
+    console.log(er);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const skillsSections = await skillsSection.find().populate("skills");
+    const projects = await project.find();
+    const urls = {
+      github_url,
+      linkedin_url,
+    };
+    res.status(200).json({
+      message: "Welcome to Portfolio API",
+      data: { skillsSections, projects, urls },
+    });
   } catch (er) {
     console.log(er);
     res.status(500).json({ message: "Something went wrong" });
