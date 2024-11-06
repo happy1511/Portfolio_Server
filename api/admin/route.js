@@ -6,6 +6,8 @@ const multer = require("multer");
 const skill = require("../../db/model/Skill");
 const fs = require("fs");
 const skillsSection = require("../../db/model/skillsSection");
+const Skill = require("../../db/model/Skill");
+const { github_url, linkedin_url } = require("../../db/model/urls");
 
 const router = express.Router();
 
@@ -23,7 +25,7 @@ const storage = multer.diskStorage({
     cb(null, filename);
   },
 });
-// Multer setup with storage and file filter
+
 const storageIcon = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, "../../assets/skills");
@@ -381,22 +383,36 @@ router.post("/resume", uploadResume, (req, res) => {
   });
 });
 
-// Route to get the resume path
 router.get("/resume", (req, res) => {
-  // Here you should implement the logic to retrieve the resume path
-  // This could be from a database or a configuration file, depending on your setup.
-  // For demonstration, we'll assume you have a hardcoded path or fetch from a database.
-
-  // Example: Fetch resume path from a database (assuming you have a Resume model)
-  // const resumeData = await Resume.findOne(); // This would be your database call
-  // if (!resumeData) {
-  //   return res.status(404).json({ message: "No resume found." });
-  // }
-  // res.status(200).json({ path: resumeData.path });
-
-  // For now, return a placeholder response
-  const resumePath = "/assets/resumes/example-resume.pdf"; // Placeholder path
+  const resumePath = "/assets/resumes/example-resume.pdf";
   res.status(200).json({ path: resumePath });
+});
+
+router.get("/dashboard", async (req, res) => {
+  try {
+    const skillsCount = await Skill.countDocuments();
+    const skillSectionsCount = await skillsSection.countDocuments();
+    const projectsCount = await project.countDocuments();
+
+    const resumePath = "/assets/resumes/Happy_Patel.pdf";
+
+    res.status(200).json({
+      counts: {
+        skills: skillsCount,
+        skillSections: skillSectionsCount,
+        projects: projectsCount,
+      },
+      urls: {
+        github_url,
+        linkedin_url,
+      },
+      resumePath,
+      message: "Dashboard data fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({ message: "Error fetching dashboard data", error });
+  }
 });
 
 module.exports = router;
