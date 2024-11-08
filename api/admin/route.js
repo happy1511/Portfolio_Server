@@ -515,18 +515,19 @@ router.post(
   "/projects",
   upload,
   async (req, res) => {
-    const { name, description, skillsUsed, githubLink, websiteLink } = req.body;
+    const { name, description, skillsUsed, githubLink } = req.body;
     const videoPath = req.file ? req.file.path : null;
 
     try {
-      const newProject = new project({
+      const data = {
         name,
         description,
         skillsUsed: JSON.parse(skillsUsed),
         githubLink,
-        websiteLink,
         videoPath,
-      });
+        websiteLink: req.body.websiteLink || null,
+      };
+      const newProject = new project(data);
 
       await newProject.save();
       res.status(201).json(newProject);
