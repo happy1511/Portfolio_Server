@@ -790,6 +790,8 @@ router.post(
           .json({ message: "Resume upload failed. No file found." });
       }
 
+      urls.resume = req.file.path;
+
       // Send back the URL of the uploaded file
       res.status(201).json({
         message: "Resume uploaded successfully",
@@ -810,8 +812,7 @@ router.post(
 );
 
 router.get("/resume", (req, res) => {
-  const resumePath = "/assets/resumes/example-resume.pdf";
-  res.status(200).json({ path: resumePath });
+  res.status(200).json({ path: urls.resume });
 });
 
 router.get("/dashboard", async (req, res) => {
@@ -820,8 +821,7 @@ router.get("/dashboard", async (req, res) => {
     const skillSectionsCount = await skillsSection.countDocuments();
     const projectsCount = await project.countDocuments();
 
-    const resumePath =
-      "https://res.cloudinary.com/dszbuhdfz/image/upload/v1731069452/resumes/Happy_Patel.pdf";
+    const resumePath = urls.resume;
 
     res.status(200).json({
       counts: {
